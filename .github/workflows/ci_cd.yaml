@@ -10,9 +10,13 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+    - name: Setup Java 
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        cache: 'maven'
     - name: Print Java Version
-      run: java -version
-    - name: Print Maven Version
-      run: mvn --version    
+      run: java -v    
     - name: Maven Clean Package
       run:  mvn clean package
