@@ -7,6 +7,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SONARQUBEURL: http://35.154.32.179:9000/
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -22,3 +24,5 @@ jobs:
       run: mvn --version      
     - name: Maven Clean Package
       run:  mvn clean package
+    - name: Sonar Scan
+      run: mvn clean verify soanr:sonar -Dsonar.host.url=$SONARQUBEURL -Dsonar.token=${{ secrets.SONARQUBETOKEN }}
