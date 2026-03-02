@@ -28,6 +28,23 @@ jobs:
       run:  mvn clean package
     - name: Sonar Scan
       run: mvn clean verify sonar:sonar -Dsonar.host.url=$SONARQUBEURL -Dsonar.token=${{ secrets.SONARQUBETOKEN }}
+    - name: Uplodate war file
+      uses: actions/upload-artifact@v4
+      with:
+        name: javawebappwar
+        path: target/java-web-app.war
+
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: javawebappwar
+    - name:  List Contents
+      run: ls -lar
     - name: Copy Application War via SSH to Tomcat Sever
       uses: nogsantos/scp-deploy@master
       with:
@@ -35,5 +52,5 @@ jobs:
         user: ${{ secrets.TOMCAT_VM_USERNAME }}
         key: ${{ secrets.TOMCAT_VM_SSH_KEY }}
         port: 22
-        src: "target/java-web-app.war"
+        src: "java-web-app.war"
         remote: "/opt/tomcat/webapps"
