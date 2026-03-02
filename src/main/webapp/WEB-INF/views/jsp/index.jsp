@@ -113,7 +113,7 @@
 			<div class="row">
 				<div class="col-lg-8">
 					<h2>About Rushi Technologies</h2>
-					<h3><i class="fas fa-map-marker-alt"></i> Hyderabad, Karnataka, India</h3>
+					<h3><i class="fas fa-map-marker-alt"></i> Banglore, Karnataka, India</h3>
 					<p class="lead">
 						Rushi Technologies Private Limited is a leading provider of innovative IT solutions, 
 						specializing in cloud infrastructure, DevOps, and modern application development.
@@ -123,7 +123,7 @@
 					<div class="contact-info" id="contact">
 						<div class="mb-2">
 							<i class="fas fa-phone-alt"></i>
-							<strong>Phone:</strong> +91-99000 12028
+							<strong>Phone:</strong> +91-99000 12028,+91 8296242028
 						</div>
 						<div class="mb-2">
 							<i class="fas fa-envelope"></i>
