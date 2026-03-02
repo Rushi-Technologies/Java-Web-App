@@ -31,7 +31,7 @@ jobs:
       with:
         host: ${{ vars.TOMCAT_VM_IP }}
         username: ${{ secrets.TOMCAT_VM_USERNAME }}
-        password: ${{ secrets.TOMCAT_VM_SSH_KEY }}
+        key: ${{ secrets.TOMCAT_VM_SSH_KEY }}
         port: 22
         source: "target/java-web-app-1.0.war"
         target: "/opt/tomcat/webapps/java-web-app.war"
