@@ -45,12 +45,23 @@ jobs:
         name: javawebappwar
     - name:  List Contents
       run: ls -lar
-    - name: Copy Application War via SSH to Tomcat Sever
-      uses: nogsantos/scp-deploy@master
+    - name: Run commands on remote server via SSH
+      uses: appleboy/ssh-action@v1.0.3 # Use the latest version from the marketplace
       with:
         host: ${{ vars.TOMCAT_VM_IP }}
-        user: ${{ secrets.TOMCAT_VM_USERNAME }}
+        username: ${{ secrets.TOMCAT_VM_USERNAME }}
+        key: ${{ secrets.TOMCAT_VM_SSH_KEY }}
+        script: |
+            sudo systemctl stop tomcat
+            rm /opt/tomcat/webapps/java-web-app.war || true
+            sleep 30
+            sudo systemctl start tomcat
+    - name: Copy Application War via SSH to Tomcat Sever
+      uses: appleboy/scp-action@v1
+      with:
+        host: ${{ vars.TOMCAT_VM_IP }}
+        username: ${{ secrets.TOMCAT_VM_USERNAME }}
         key: ${{ secrets.TOMCAT_VM_SSH_KEY }}
         port: 22
-        src: "java-web-app.war"
-        remote: "/opt/tomcat/webapps"
+        source: "java-web-app.war"
+        target: "/opt/tomcat/webapps"
