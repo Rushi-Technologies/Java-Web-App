@@ -25,4 +25,4 @@ jobs:
     - name: Maven Clean Package
       run:  mvn clean package
     - name: Sonar Scan
-      run: mvn clean verify soanr:sonar -Dsonar.host.url=$SONARQUBEURL -Dsonar.token=${{ secrets.SONARQUBETOKEN }}
+      run: mvn clean verify sonar:sonar -Dsonar.host.url=$SONARQUBEURL -Dsonar.token=${{ secrets.SONARQUBETOKEN }}
