@@ -113,7 +113,7 @@
 			<div class="row">
 				<div class="col-lg-8">
 					<h2>About Rushi Technologies</h2>
-					<h3><i class="fas fa-map-marker-alt"></i> Bangalore, Karnataka, India</h3>
+					<h3><i class="fas fa-map-marker-alt"></i> Hyderabad, Karnataka, India</h3>
 					<p class="lead">
 						Rushi Technologies Private Limited is a leading provider of innovative IT solutions, 
 						specializing in cloud infrastructure, DevOps, and modern application development.
