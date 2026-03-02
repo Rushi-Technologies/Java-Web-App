@@ -2,7 +2,9 @@ name: JavaWebApp CI/CD Workflow
 
 on:
   workflow_dispatch:
-
+  push:
+    branches:
+    - main
 
 jobs:
   build:

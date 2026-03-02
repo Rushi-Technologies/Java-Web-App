@@ -123,7 +123,7 @@
 					<div class="contact-info" id="contact">
 						<div class="mb-2">
 							<i class="fas fa-phone-alt"></i>
-							<strong>Phone:</strong> +91-99000 12028,+91-82962 42028 
+							<strong>Phone:</strong> +91-99000 12028
 						</div>
 						<div class="mb-2">
 							<i class="fas fa-envelope"></i>
