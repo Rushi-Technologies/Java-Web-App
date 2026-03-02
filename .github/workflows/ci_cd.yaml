@@ -33,5 +33,5 @@ jobs:
         username: ${{ secrets.TOMCAT_VM_USERNAME }}
         key: ${{ secrets.TOMCAT_VM_SSH_KEY }}
         port: 22
-        source: "target/java-web-app-1.0.war"
-        target: "/opt/tomcat/webapps/java-web-app.war"
+        source: "target/java-web-app.war"
+        target: "/opt/tomcat/webapps/"

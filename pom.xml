@@ -112,6 +112,7 @@
 	</distributionManagement> -->
 	
 	<build>
+	    <finalName>java-web-app</finalName>
 		<plugins>
 		    <plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
