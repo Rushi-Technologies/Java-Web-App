@@ -26,3 +26,12 @@ jobs:
       run:  mvn clean package
     - name: Sonar Scan
       run: mvn clean verify sonar:sonar -Dsonar.host.url=$SONARQUBEURL -Dsonar.token=${{ secrets.SONARQUBETOKEN }}
+    - name: Copy Application War via SSH to Tomcat Sever
+      uses: appleboy/scp-action@v1
+      with:
+        host: ${{ vars.TOMCAT_VM_IP }}
+        username: ${{ secrets.TOMCAT_VM_USERNAME }}
+        password: ${{ secrets.TOMCAT_VM_SSH_KEY }}
+        port: 22
+        source: "target/java-web-app-1.0.war"
+        target: "/opt/tomcat/webapps/java-web-app.war"
