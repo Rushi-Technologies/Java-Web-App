@@ -17,6 +17,8 @@ jobs:
         java-version: '11'
         cache: 'maven'
     - name: Print Java Version
-      run: java -v    
+      run: java -version
+    - name: Print Maven Version
+      run: mvn --version      
     - name: Maven Clean Package
       run:  mvn clean package
