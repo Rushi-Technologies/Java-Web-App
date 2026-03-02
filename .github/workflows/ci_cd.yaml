@@ -34,4 +34,4 @@ jobs:
         key: ${{ secrets.TOMCAT_VM_SSH_KEY }}
         port: 22
         source: "target/java-web-app.war"
-        target: "/opt/tomcat/webapps/"
+        target: "/opt/tomcat/webapps/java-web-app.war"
