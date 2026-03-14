@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: javabweapp-ingress
+  namespace: test-ns
+spec:
+  ingressClassName: "nginx"
+  rules:
+  - host: javawebapp.rushiitechnologies.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: javawebapp-svc
+            port: 
+              number: 80

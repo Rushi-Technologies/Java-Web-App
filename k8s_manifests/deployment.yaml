@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: javawebapp
+  namespace: test-ns
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: javawebapp
+  template:
+    metadata:
+      labels:
+        app: javawebapp
+    spec:
+      containers:
+      - name: javawebapp
+        image: 559056419894.dkr.ecr.ap-south-1.amazonaws.com/java-web-app:IMAGE_TAG
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        livnessProbe:
+          httpGet:
+             port: 8089
+             path: /java-web-app/
+          initialDeplySeconds: 30
+          periodSeconds: 15
+          timoutSeconds: 5     
+        readinessProbe:
+          httpGet:
+             port: 8089
+             path: /java-web-app/
+          initialDeplySeconds: 30
+          periodSeconds: 15
+          timoutSeconds: 5

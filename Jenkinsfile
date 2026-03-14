@@ -1,40 +1,79 @@
-node{
-     
-    stage('SCM Checkout'){
-        git url: 'https://github.com/Rushi-Technologies/java-web-app.git',branch: 'master'
-    }
-    
-    stage(" Maven Clean Package"){
-      def mavenHome =  tool name: "Maven-3.5.6", type: "maven"
-      def mavenCMD = "${mavenHome}/bin/mvn"
-      sh "${mavenCMD} clean package"
-      
-    } 
-    
-    
-    stage('Build Docker Image'){
-        sh 'docker build -t rushitechnologiesbalaji/java-web-app .'
-    }
-    
-    stage('Push Docker Image'){
-        withCredentials([string(credentialsId: 'Docker_Hub_Pwd', variable: 'Docker_Hub_Pwd')]) {
-          sh "docker login -u rushitechnologiesbalaji -p ${Docker_Hub_Pwd}"
-        }
-        sh 'docker push rushitechnologiesbalaji/java-web-app'
+pipeline {
+    agent any
+
+    triggers {
+       githubPush()
      }
-     
-      stage('Run Docker Image In Dev Server'){
-        
-        def dockerRun = ' docker run  -d -p 8080:8080 --name java-web-app rushitechnologiesbalaji/java-web-app'
-         
-         sshagent(['DOCKER_SERVER']) {
-          sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.20.72 docker stop java-web-app || true'
-          sh 'ssh  ubuntu@172.31.20.72 docker rm java-web-app || true'
-          sh 'ssh  ubuntu@172.31.20.72 docker rmi -f  $(docker images -q) || true'
-          sh "ssh  ubuntu@172.31.20.72 ${dockerRun}"
+
+    options {
+      buildDiscarder logRotator(numToKeepStr: '5')
+      timeout(time: 10, unit: 'MINUTES')
+      disableConcurrentBuilds()
+    }
+    
+    environment {
+        AWS_REGION = "ap-south-1"
+        EKS_CLUSTER_NAME = "eks-demo"
+        IMAGE_REGISTRY_ENDPOINT = "775694652978.dkr.ecr.ap-south-1.amazonaws.com"
+        IMAGE_REPOSITORY_NAME = "java-web-app"
+        IMAGE_REGISTRY = "${IMAGE_REGISTRY_ENDPOINT}/${IMAGE_REPOSITORY_NAME}"
+    }
+
+    tools {
+        maven 'Maven-3.9.10'
+    }
+
+    stages {
+
+
+      stage("Run Unit Tests"){
+           steps {
+               sh "mvn clean test"
+           }
+       } 
+
+
+
+      stage("Maven Clean Package"){
+           steps {
+               sh "mvn clean package"
+           }
        }
+
+
+        stage("Build Docker Image"){
+             steps {
+                 sh "docker build -t ${IMAGE_REGISTRY}:$BUILD_NUMBER ."
+             }
+         }
+         
+
+        stage("Update Image Tag in K8s Manifset"){
+            steps {
+               sh """
+                   sed -i "s/IMAGE_TAG/$BUILD_NUMBER/g" k8s_manifests/deployment.yaml
+               """
+            }
+        }
+        
+        stage("Push Docker Image to ECR"){
+             steps {
+                     sh """
+                         aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${IMAGE_REGISTRY_ENDPOINT}
+                         docker push ${IMAGE_REGISTRY}:$BUILD_NUMBER
+                     """
+             }
+         }
+         
+         stage("Deploy to Kubernetes"){
+             steps {
+                 sh """
+                     aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
+                     kubectl apply -f k8s_manifests/
+                 """
+             }
+         }
        
     }
-     
-     
+       
 }
