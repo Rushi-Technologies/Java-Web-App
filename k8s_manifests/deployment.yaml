@@ -30,7 +30,7 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 8080
-        livnessProbe:
+        livenessProbe:
           httpGet:
              port: 8089
              path: /java-web-app/
