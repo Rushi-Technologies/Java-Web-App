@@ -18,7 +18,7 @@ public class HelloWorldService {
 	public String getDesc() {
 		logger.info("========== HelloWorldService.getDesc() START ==========");
 		logger.debug("[DEBUG] getDesc() method is being executed");
-		String description = "Maven + Spring MVC Example By Rushi Technologies";
+		String description = "Sample Application  By Rushi Technologies";
 		logger.debug("[DEBUG] Generated description: {}", description);
 		logger.info("========== HelloWorldService.getDesc() END ==========");
 		return description;
