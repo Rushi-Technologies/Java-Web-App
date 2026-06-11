@@ -127,7 +127,7 @@
 						</div>
 						<div class="mb-2">
 							<i class="fas fa-envelope"></i>
-							<strong>Email:</strong> rushitechnologiesbanglore@gmail.com
+							<strong>Email:</strong> balajireddy.urs@gmail.com
 						</div>
 						<div>
 							<i class="fas fa-globe"></i>
