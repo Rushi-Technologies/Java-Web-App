@@ -123,11 +123,11 @@
 					<div class="contact-info" id="contact">
 						<div class="mb-2">
 							<i class="fas fa-phone-alt"></i>
-							<strong>Phone:</strong> +91-99000 12028,+91 8296242028
+							<strong>Phone:</strong> +91-99000 12028
 						</div>
 						<div class="mb-2">
 							<i class="fas fa-envelope"></i>
-							<strong>Email:</strong> balajireddy.urs@gmail.com
+							<strong>Email:</strong> rushitechnologiesbanglore@gmail.com
 						</div>
 						<div>
 							<i class="fas fa-globe"></i>
