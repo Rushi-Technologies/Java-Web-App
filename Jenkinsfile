@@ -2,110 +2,81 @@ pipeline {
     agent any
 
     triggers {
-      githubPush()
-    }
-    options {
-      buildDiscarder logRotator(numToKeepStr: '5')
-      timeout(time: 10, unit: 'MINUTES')
-      disableConcurrentBuilds()
-    }
-    
-    environment {
-        AWS_REGION = "ap-south-1"
-        EKS_CLUSTER_NAME = "eks-demo"
-        IMAGE_REGISTRY_ENDPOINT = "559056419894.dkr.ecr.ap-south-1.amazonaws.com"
-        IMAGE_REPOSITORY_NAME = "java-web-app"
-        IMAGE_REGISTRY = "${IMAGE_REGISTRY_ENDPOINT}/${IMAGE_REPOSITORY_NAME}"
-        TRIVY_CACHE_DIR = "${WORKSPACE}/.trivycache"
-        TMPDIR = "${WORKSPACE}/.trivytmp"
+        githubPush()
     }
 
-    tools {
-        maven 'Maven-3.9.16'
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+        timeout(time: 10, unit: 'MINUTES')
+        disableConcurrentBuilds()
     }
 
     stages {
+        stage('Run Unit Tests') {
+            steps {
+                 sh "mvn clean test"
+            }
+        }
+        stage('Build') {
+            steps {
+                sh "mvn clean package"
+            }
+        }
+        stage('Sonar Scan') {
+            steps {
+                withSonarQubeEnv('SonarQube_Server') {
+                    sh "mvn sonar:sonar"
+                }
+            }
+        }
 
-      stage("Run Unit Tests"){
-           steps {
-               sh "mvn clean test"
-           }
-       } 
+      stage('Wait for Quality Gate Result') {
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
+                     waitForQualityGate abortPipeline: true
+                } 
+            }
+        }
+
+       stage("Deploy to Tomcat"){
+             environment {
+                 TOMCAT_SERVER_IP = "172.31.2.59"
+             }
+            steps {
+                sshagent(credentials: ['Tomcat_Server_SSH_Cred']) {
+                     sh """ssh -o StrictHostKeyChecking=no  ec2-user@${TOMCAT_SERVER_IP} sudo systemctl stop tomcat
+                           ssh -o StrictHostKeyChecking=no  ec2-user@${TOMCAT_SERVER_IP} rm -f /opt/tomcat/webapps/java-web-app.war
+                           sleep 10s
+                           scp  -o StrictHostKeyChecking=no target/java-web-app*.war ec2-user@${TOMCAT_SERVER_IP}:/opt/tomcat/webapps/java-web-app.war
+                           ssh -o StrictHostKeyChecking=no  ec2-user@${TOMCAT_SERVER_IP} sudo systemctl start tomcat"""
+                }
+            }
+        }
 
 
-
-      stage("Maven Clean Package"){
-           steps {
-               sh "mvn clean package"
-           }
-       }
-       
-       stage("Sonar Scan") {
-           
-           steps {
-               withSonarQubeEnv("SonarQube_Server"){
-                   sh '''
-                        mvn sonar:sonar
-                   '''
-               }
-           }
-       }
-       
-       stage("WaitForQualityGateResult"){
-           
-          steps {
-              script {
-                  timeout(time: 10, unit: 'MINUTES'){
-                      def qg = waitForQualityGate()
-                      if  (qg.status != 'OK') {
-                          error "Pipline aborted due to Failing SonarQube Qualtity Gate ${qg.status}"
-                      }
-                  }
-              }
-              
-          }
-       }
-       
-       stage("Build Docker Image"){
-           steps {
-               sh "docker build -t ${IMAGE_REGISTRY}:$BUILD_NUMBER ."
-           }
-       }
-       
-        stage(" Scan Docker Image"){
-           steps {
-                sh "mkdir -p ${TRIVY_CACHE_DIR} || true"
-                sh "mkdir -p ${TMPDIR} || true"
-                sh "trivy image --cache-dir ${TRIVY_CACHE_DIR} --severity HIGH,CRITICAL ${IMAGE_REGISTRY}:$BUILD_NUMBER"
-           }
-       }
-       
-       stage("Push Docker Image to ECR"){
-           steps {
-               sh """
-               aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${IMAGE_REGISTRY_ENDPOINT}
-               docker push ${IMAGE_REGISTRY}:$BUILD_NUMBER
-               """
-           }
-       }
-       
-       stage("Update Image Tag in K8s Manifest"){
-           steps {
-               sh """
-                    sed -i "s/IMAGE_TAG/$BUILD_NUMBER/g" k8s_manifests/deployment.yaml
-               """
-           }
-       }
-       
-       stage("Deploy to K8s"){
-           steps {
-               sh """
-                  aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
-                  kubectl apply -f k8s_manifests/
-               """
-           }
-       }
-       
     }
-       
+
+    post {
+        always {
+            sendEmail(currentBuild.currentResult)
+        }
+    }
+}
+
+def sendEmail(String buildStatus){
+    emailext body:  """
+                    <html>
+                    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                        <h2 style="color: #2d87f0;">Jenkins Build Notification</h2>
+                        <p><strong>Build Result:</strong> ${buildStatus}</p>
+                        <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
+                        <p><strong>Project:</strong> ${env.JOB_NAME}</p>
+                        <p><strong>Build URL:</strong> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                        <p>For more details, please visit the Jenkins job page.</p>
+                    </body>
+                    </html>
+                    """, 
+        subject: "${env.JOB_NAME} - ${env.BUILD_NUMBER} - ${buildStatus}", 
+        to: 'balajireddy.urs@gmail.com,rushitechnologiesbanglore@gmail.com',
+        mimeType: 'text/html'
 }
