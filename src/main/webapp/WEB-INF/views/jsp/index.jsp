@@ -113,7 +113,7 @@
 			<div class="row">
 				<div class="col-lg-8">
 					<h2>About Rushi Technologies</h2>
-					<h3><i class="fas fa-map-marker-alt"></i> Banglore, Karnataka, India</h3>
+					<h3><i class="fas fa-map-marker-alt"></i> Bengaluru, Karnataka, India</h3>
 					<p class="lead">
 						Rushi Technologies Private Limited is a leading provider of innovative IT solutions, 
 						specializing in cloud infrastructure, DevOps, and modern application development.
@@ -127,7 +127,7 @@
 						</div>
 						<div class="mb-2">
 							<i class="fas fa-envelope"></i>
-							<strong>Email:</strong> rushitechnologiesbanglore@gmail.com
+							<strong>Email:</strong> test@gmail.com
 						</div>
 						<div>
 							<i class="fas fa-globe"></i>
