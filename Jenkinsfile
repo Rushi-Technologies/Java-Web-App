@@ -11,6 +11,10 @@ pipeline {
         disableConcurrentBuilds()
     }
 
+    tools {
+        maven 'Maven-3.10'
+    }
+
     stages {
         stage('Run Unit Tests') {
             steps {
