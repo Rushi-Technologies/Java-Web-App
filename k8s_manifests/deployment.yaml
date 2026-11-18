@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: javawebapp
-        image: 559056419894.dkr.ecr.ap-south-1.amazonaws.com/java-web-app:3
+        image: 559056419894.dkr.ecr.ap-south-1.amazonaws.com/java-web-app:IMAGE_TAG
         resources:
           requests:
             cpu: 250m
